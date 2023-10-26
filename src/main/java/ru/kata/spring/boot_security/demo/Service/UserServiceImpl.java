@@ -57,7 +57,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void update(User user, Long id) {
+    public void update(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setUsername(user.getUsername());
         user.setEmail(user.getEmail());

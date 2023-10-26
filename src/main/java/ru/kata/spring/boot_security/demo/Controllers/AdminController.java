@@ -10,6 +10,8 @@ import ru.kata.spring.boot_security.demo.Service.RoleService;
 import ru.kata.spring.boot_security.demo.Service.UserService;
 import ru.kata.spring.boot_security.demo.model.User;
 
+import java.security.Principal;
+
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
@@ -24,44 +26,33 @@ public class AdminController {
 
     @Secured("ADMIN")
     @GetMapping
-    public String getUsers(Model model) {
+    public String getUsers(Model model, Principal principal) {
         model.addAttribute("user", userService.getAllUsers());
+        model.addAttribute("anotherUser",userService.findByUsername(principal.getName()));
         return "admin";
     }
 
-    @DeleteMapping("/{id}")
-    public String delete(@PathVariable("id") Long id) {
+    @DeleteMapping("/delete")
+    public String delete(@RequestParam("id") Long id) {
         userService.delete(id);
         return "redirect:/admin";
     }
 
-    @GetMapping("/edit/{id}")
-    public String editUser(@PathVariable("id") Long id, Model model) {
-        model.addAttribute("user", userService.getById(id));
-        model.addAttribute("roles", roleService.listRoles());
-        return "edit";
-    }
-
-    @PatchMapping("/edit/{id}")
-    public String updateUser(@PathVariable("id") Long id, @ModelAttribute("user") User user) {
-        userService.update(user,id);
+    @PutMapping("/update/{id}")
+    public String updateUser(@ModelAttribute("user") User user) {
+        userService.update(user);
         return "redirect:/admin";
     }
 
     @GetMapping("/registration")
     public String registrationPage(@ModelAttribute("user") User user ,Model model) {
         model.addAttribute("roles", roleService.listRoles());
-        return "registration";
+        return "redirect:/admin";
     }
 
     @PostMapping("/registration")
     public String performRegistration(@ModelAttribute("user") User user) {
         userService.save(user);
         return "redirect:/admin";
-    }
-    @Secured("ADMIN")
-    @GetMapping("/secret")
-    public String music() {
-        return "index";
     }
 }
