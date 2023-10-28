@@ -2,12 +2,14 @@ package ru.kata.spring.boot_security.demo.model;
 
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "users")
@@ -34,8 +36,7 @@ public class User implements UserDetails {
     public User() {
     }
 
-    public User(Long id, String username, String password, String email, List<Role> listRole) {
-        this.id = id;
+    public User(String username, String password, String email, List<Role> listRole) {
         this.username = username;
         this.password = password;
         this.email = email;
@@ -44,7 +45,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return getListRole();
+       return listRole.stream().map(r -> new SimpleGrantedAuthority(r.getRolename())).collect(Collectors.toList());
     }
 
     @Override
